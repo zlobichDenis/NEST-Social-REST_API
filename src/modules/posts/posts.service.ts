@@ -29,7 +29,7 @@ export class PostsService {
     }
 
     async createPost(dto: CreatePostDto): Promise<PostEntity> {
-        const newPost = await this.postsRepository.save(dto);
+        const newPost = await this.postsRepository.create(dto);
         await this.postsRepository.save(newPost);
 
         return newPost;
