@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    HttpCode,
+    Post,
+    Req,
+    Res,
+    UseGuards,
+} from '@nestjs/common';
 import { Response } from 'express';
 
 import { AuthenticationService } from './authentication.service';
@@ -20,11 +28,13 @@ export class AuthenticationController {
     @HttpCode(200)
     @UseGuards(LocalAuthenticationGuard)
     @Post('login')
-    async login(@Req() { user }: RequestWithUser, @Res() response: Response) {
-        const cookie = await this.authenticationService.getCookieWithJwtToken(user.id);
-        response.setHeader('Set-Cookie', cookie);
+    async login(@Req() request: RequestWithUser) {
+        const { user } = request;
 
-        return response.send(user);
+        const cookie = await this.authenticationService.getCookieWithJwtToken(user.id);
+        request.res?.setHeader('Set-Cookie', cookie);
+
+        return user;
     }
 
     @Post('logout')

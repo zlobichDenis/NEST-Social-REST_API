@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { UserEntity } from '../users/entities';
 import { UpdatePostDto, CreatePostDto } from './dto';
 import { PostEntity } from './entities';
 import { PostNotFound } from './exceptions';
@@ -15,11 +16,17 @@ export class PostsService {
     }
 
     async getAllPosts(): Promise<PostEntity[]> {
-        return this.postsRepository.find();
+        return this.postsRepository.find({ relations: ['author']});
     }
 
     async getPostById(id: number): Promise<PostEntity> {
-        const post = await this.postsRepository.findOneBy({ id });
+        const post = await this.postsRepository.findOne(
+            {
+                where: {
+                    id,
+                },
+                relations: ['author'],
+            });
 
         if(!post) {
             throw new PostNotFound(id);
@@ -28,8 +35,11 @@ export class PostsService {
         return post;
     }
 
-    async createPost(dto: CreatePostDto): Promise<PostEntity> {
-        const newPost = await this.postsRepository.create(dto);
+    async createPost(dto: CreatePostDto, user: UserEntity): Promise<PostEntity> {
+        const newPost = await this.postsRepository.create({
+            ...dto,
+            author: user,
+        });
         await this.postsRepository.save(newPost);
 
         return newPost;
@@ -37,7 +47,12 @@ export class PostsService {
 
     async updatePost(id: number, dto: UpdatePostDto): Promise<PostEntity> {
         await this.postsRepository.update(id, dto);
-        const updatedPost = await this.postsRepository.findOneBy({ id });
+        const updatedPost = await this.postsRepository.findOne({
+            where: {
+                id,
+            },
+            relations: ['author'],
+        });
 
         if (!updatedPost) {
             throw new PostNotFound(id);

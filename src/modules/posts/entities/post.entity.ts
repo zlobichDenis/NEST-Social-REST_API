@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn, JoinTable } from 'typeorm';
+
+import { UserEntity } from '../../users/entities';
+import { CategoryEntity } from '../../categories/entities';
 
 @Entity()
 export class PostEntity {
@@ -10,4 +13,14 @@ export class PostEntity {
 
     @Column()
     public content: string;
+
+    @Column({ nullable: true })
+    public category?: string;
+
+    @ManyToOne(() => UserEntity, (author: UserEntity) => author.posts)
+    public author: UserEntity;
+
+    @ManyToMany(() => CategoryEntity)
+    @JoinTable()
+    public categories: CategoryEntity[];
 }

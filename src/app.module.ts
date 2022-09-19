@@ -8,6 +8,7 @@ import { PostsModule } from './modules/posts/posts.module';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthenticationModule } from './modules/authentication/authentication.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AuthenticationModule } from './modules/authentication/authentication.mo
     DatabaseModule,
     UsersModule,
     AuthenticationModule,
+    CategoriesModule,
   ],
   controllers: [],
   providers: [
