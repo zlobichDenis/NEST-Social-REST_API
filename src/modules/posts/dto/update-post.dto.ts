@@ -1,5 +1,5 @@
 export interface UpdatePostDto {
-    id: string;
+    id: number;
     title: string;
     content: string;
 }
