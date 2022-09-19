@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 import * as Joi from '@hapi/joi';
 
+import { HttpException } from './utils';
 import { PostsModule } from './modules/posts/posts.module';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './modules/users/users.module';
@@ -28,6 +30,11 @@ import { AuthenticationModule } from './modules/authentication/authentication.mo
     AuthenticationModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: HttpException,
+    }
+  ],
 })
 export class AppModule {}
