@@ -10,7 +10,7 @@ export class HttpException extends BaseExceptionFilter {
         const response = context.getResponse<Response>();
         const request = context.getRequest<Request>();
         const status = exception.getStatus();
-        const message = exception.getMessage();
+        const message = exception.message
 
         response
             .status(status)

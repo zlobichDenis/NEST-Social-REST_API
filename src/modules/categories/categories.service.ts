@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 import { CategoryEntity } from './entities';
 import { NotFoundCategoryException } from './exceptions';
@@ -8,6 +9,7 @@ import { UpdateCategoryDto } from './dto';
 @Injectable()
 export class CategoriesService {
     constructor(
+        @InjectRepository(CategoryEntity)
         private readonly categoriesRepository: Repository<CategoryEntity>,
     ) {}
 

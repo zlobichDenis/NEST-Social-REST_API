@@ -9,6 +9,7 @@ import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthenticationModule } from './modules/authentication/authentication.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { FilesModule } from './modules/files/files.module';
 
 @Module({
   imports: [
@@ -23,6 +24,10 @@ import { CategoriesModule } from './modules/categories/categories.module';
         PORT: Joi.number(),
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION_TIME: Joi.string().required(),
+        AWS_REGION: Joi.string().required(),
+        AWS_ACCESS_KEY_ID: Joi.string().required(),
+        AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+        AWS_PUBLIC_BUCKET_NAME: Joi.string().required(),
       })
     }),
     PostsModule,
@@ -30,6 +35,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
     UsersModule,
     AuthenticationModule,
     CategoriesModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [
