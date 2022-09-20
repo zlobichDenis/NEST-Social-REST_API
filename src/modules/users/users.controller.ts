@@ -1,4 +1,4 @@
-import { Controller, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Delete, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { JwtAuthenticationGuard } from '../authentication/guards';
@@ -14,8 +14,20 @@ export class UsersController {
     @Post('avatar')
     @UseGuards(JwtAuthenticationGuard)
     @UseInterceptors(FileInterceptor('file'))
-    // @ts-ignore
-    async addAvatar(@Req() request: RequestWithUser, @UploadedFile() file: Express.Multer.File) {
+    async addAvatar(@Req() request: RequestWithUser, @UploadedFile() file: any) {
         return this.usersService.addAvatar(request.user.id, file.buffer, file.originalname);
+    }
+
+    @Post('files')
+    @UseGuards(JwtAuthenticationGuard)
+    @UseInterceptors(FileInterceptor('file'))
+    async addFile(@Req() request: RequestWithUser, @UploadedFile() file: any) {
+        return this.usersService.addPrivateFile(request.user.id, file.buffer, file.originalname);
+    }
+
+    @Delete('files:fileId')
+    @UseGuards(JwtAuthenticationGuard)
+    async deleteFile(@Req() request: RequestWithUser, @Param('fileId') fileId: number) {
+        return this.usersService.deletePrivateFile(request.user.id, fileId);
     }
 }

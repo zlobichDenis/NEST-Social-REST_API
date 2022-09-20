@@ -10,6 +10,7 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthenticationModule } from './modules/authentication/authentication.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { FilesModule } from './modules/files/files.module';
+import { PrivateFilesModule } from './modules/private-files/private-files.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { FilesModule } from './modules/files/files.module';
         AWS_ACCESS_KEY_ID: Joi.string().required(),
         AWS_SECRET_ACCESS_KEY: Joi.string().required(),
         AWS_PUBLIC_BUCKET_NAME: Joi.string().required(),
+        AWS_PRIVATE_BUCKET_NAME: Joi.string().required(),
       })
     }),
     PostsModule,
@@ -36,6 +38,7 @@ import { FilesModule } from './modules/files/files.module';
     AuthenticationModule,
     CategoriesModule,
     FilesModule,
+    PrivateFilesModule,
   ],
   controllers: [],
   providers: [

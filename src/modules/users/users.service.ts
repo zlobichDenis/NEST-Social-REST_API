@@ -2,11 +2,13 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { PrivateFilesService } from '../private-files/private-files.service';
 import { PublicFileEntity } from '../files/entities';
 import { FilesService } from '../files/files.service';
 import { UserEntity } from './entities';
 import { errorMessages } from './constants';
 import { CreateUserDto } from './dto';
+import { PrivateFileEntity } from '../private-files/entities';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +16,7 @@ export class UsersService {
         @InjectRepository(UserEntity)
         private readonly usersRepository: Repository<UserEntity>,
         private readonly filesService: FilesService,
+        private readonly privateFilesService: PrivateFilesService,
     ) {}
 
     async getByEmail(email: string): Promise<UserEntity> {
@@ -61,5 +64,13 @@ export class UsersService {
         });
 
         return avatar;
+    }
+
+    async addPrivateFile(userId: number, imageBuffer: Buffer, filename: string): Promise<PrivateFileEntity> {
+        return this.privateFilesService.uploadPrivateFile(imageBuffer, userId, filename);
+    }
+
+    async deletePrivateFile(userId: number, fileId: number): Promise<void> {
+        return this.privateFilesService.deletePrivateFile(fileId, userId);
     }
 }

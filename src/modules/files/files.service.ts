@@ -16,7 +16,7 @@ export class FilesService {
         private readonly configService: ConfigService,
     ) {}
 
-    async uploadPublicFile(dataBuffer: Buffer, filename: string) {
+    async uploadPublicFile(dataBuffer: Buffer, filename: string): Promise<PublicFileEntity> {
         const s3 = new S3();
         const uploadResult = await s3.upload({
             Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME') || '',
