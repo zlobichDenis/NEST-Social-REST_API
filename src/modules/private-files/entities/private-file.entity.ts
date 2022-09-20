@@ -1,4 +1,5 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
 import { UserEntity } from '../../users/entities';
 
 @Entity()
@@ -9,6 +10,6 @@ export class PrivateFileEntity {
     @Column()
     public key: string;
 
-    @ManyToMany(() => UserEntity, (owner: UserEntity) => owner.files)
+    @ManyToOne(() => UserEntity, (owner: UserEntity) => owner.files)
     public owner: UserEntity;
 }

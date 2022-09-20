@@ -9,6 +9,7 @@ import { UserEntity } from './entities';
 import { errorMessages } from './constants';
 import { CreateUserDto } from './dto';
 import { PrivateFileEntity } from '../private-files/entities';
+import { UserNotFoundException } from './exceptions';
 
 @Injectable()
 export class UsersService {
@@ -72,5 +73,32 @@ export class UsersService {
 
     async deletePrivateFile(userId: number, fileId: number): Promise<void> {
         return this.privateFilesService.deletePrivateFile(fileId, userId);
+    }
+
+    async getPrivateFile(userId: number, fileId: number) {
+        return await this.privateFilesService.getPrivateFile(fileId, userId);
+    }
+
+    async getAllPrivateFiles(userId: number) {
+        const userWithFiles = await this.usersRepository.findOne({
+            where: {
+                id: userId,
+            },
+            relations: ['files'],
+        });
+
+        if (!userWithFiles) {
+            throw new UserNotFoundException();
+        }
+
+        return Promise.all([
+            userWithFiles.files.map(async (file) => {
+                const url = await this.privateFilesService.getPreassignedUrl(file.key);
+                return {
+                    ...file,
+                    url,
+                };
+            })
+        ]);
     }
 }

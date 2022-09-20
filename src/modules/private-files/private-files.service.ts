@@ -6,7 +6,7 @@ import { S3 } from 'aws-sdk';
 import { v4 as uuid } from 'uuid';
 
 import { PrivateFileEntity } from './entities';
-import { FileNotFoundException, ForbiddenDeleteException } from '../files/exceptions';
+import { FileNotFoundException, ForbiddenAccessException } from './exceptions';
 
 @Injectable()
 export class PrivateFilesService {
@@ -45,7 +45,7 @@ export class PrivateFilesService {
         }
 
         if (file.owner.id !== userId) {
-            throw new ForbiddenDeleteException(fileId);
+            throw new ForbiddenAccessException(fileId);
         }
 
         await s3.deleteObject({
@@ -54,5 +54,43 @@ export class PrivateFilesService {
         }).promise()
 
         await this.privateFilesRepository.delete(fileId);
+    }
+
+    async getPrivateFile(fileId: number, userId: number) {
+        const s3 = new S3();
+
+        const fileInfo = await this.privateFilesRepository.findOne({
+            where: {
+                id: fileId,
+            },
+            relations: ['owner'],
+        });
+
+        if (!fileInfo) {
+            throw new FileNotFoundException(fileId);
+        }
+
+        if (fileInfo.owner.id !== userId) {
+            throw new ForbiddenAccessException(fileId);
+        }
+
+        const stream = await s3.getObject({
+            Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME') || '',
+            Key: fileInfo.key,
+        }).createReadStream();
+
+        return {
+            stream,
+            info: fileInfo,
+        }
+    }
+
+    async getPreassignedUrl(key: string): Promise<string> {
+        const s3 = new S3();
+
+        return s3.getSignedUrl('getObject', {
+            Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME') || '',
+            Key: key,
+        });
     }
 }
