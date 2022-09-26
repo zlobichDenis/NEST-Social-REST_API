@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { PrivateFilesService } from '../private-files/private-files.service';
@@ -19,6 +19,7 @@ export class UsersService {
         private readonly usersRepository: Repository<UserEntity>,
         private readonly filesService: FilesService,
         private readonly privateFilesService: PrivateFilesService,
+        private readonly dataSource: DataSource,
     ) {}
 
     async getByEmail(email: string): Promise<UserEntity> {
@@ -125,5 +126,30 @@ export class UsersService {
         return this.usersRepository.update(userId, {
             currentHashedRefreshToken: undefined,
         });
+    }
+
+    async deleteAvatar(userId: number) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        const user = await this.getById(userId);
+
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            await queryRunner.manager.update(UserEntity, userId, {
+                ...user,
+                avatar: undefined,
+            });
+
+            if (user.avatar?.id) {
+                await this.filesService.deletePublicFileWithQueryRunner(user.avatar.id, queryRunner.manager);
+            }
+
+            await queryRunner.commitTransaction();
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+        } finally {
+            await queryRunner.release();
+        }
     }
 }
