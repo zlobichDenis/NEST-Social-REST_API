@@ -7,6 +7,8 @@ import { UpdatePostDto, CreatePostDto } from './dto';
 import { PostEntity } from './entities';
 import { PostNotFound } from './exceptions';
 import { PostSearchService } from './post-search/post-search.service';
+import { PaginationParams } from '../../utils';
+import { GetAllPostsResponse } from './types';
 
 @Injectable()
 export class PostsService {
@@ -17,8 +19,22 @@ export class PostsService {
     ) {
     }
 
-    async getAllPosts(): Promise<PostEntity[]> {
-        return this.postsRepository.find({ relations: ['author']});
+    async getAllPosts({ offset, limit }: PaginationParams): Promise<GetAllPostsResponse> {
+        const [items, total] = await this.postsRepository.findAndCount({
+            relations: ['author'],
+            order: {
+                id: 'DESC',
+            },
+            skip: offset,
+            take: limit,
+        })
+
+        return {
+            items,
+            total,
+            offset,
+            limit,
+        }
     }
 
     async getPostById(id: number): Promise<PostEntity> {
@@ -76,8 +92,8 @@ export class PostsService {
         this.postSearchService.delete(id);
     }
 
-    async searchForPosts(text: string) {
-        const results = await this.postSearchService.search(text);
+    async searchForPosts(text: string, paginationParams: PaginationParams) {
+        const results = await this.postSearchService.search(text, paginationParams);
         const ids = results.map((result) => result.id);
 
         if (!ids.length) {

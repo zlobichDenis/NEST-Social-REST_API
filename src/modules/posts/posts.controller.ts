@@ -11,7 +11,7 @@ import {
     Query,
 } from '@nestjs/common';
 
-import { FindOneParams } from '../../utils';
+import { FindOneParams, PaginationParams } from '../../utils';
 import { PostsService } from './posts.service';
 import { CreatePostDto, UpdatePostDto } from './dto';
 import { JwtAuthenticationGuard } from '../authentication/guards';
@@ -25,12 +25,15 @@ export class PostsController {
     ) {}
 
     @Get()
-    async getPosts(@Query('search') search: string) {
+    async getPosts(
+        @Query('search') search: string,
+        @Query() { offset, limit }: PaginationParams,
+    ) {
         if (!search) {
-            return this.postsService.getAllPosts();
+            return this.postsService.getAllPosts({ offset, limit });
         }
 
-        return this.postsService.searchForPosts(search);
+        return this.postsService.searchForPosts(search, { offset, limit });
     }
 
     @Get(':id')

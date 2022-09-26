@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { PostEntity } from '../entities';
 import { PostSearchBody, PostSearchResult } from '../types';
+import { PaginationParams } from '../../../utils';
 
 @Injectable()
 export class PostSearchService {
@@ -23,15 +24,22 @@ export class PostSearchService {
         });
     }
 
-    async search(text: string): Promise<PostSearchBody[]> {
+    async search(text: string, { offset, limit }: PaginationParams): Promise<PostSearchBody[]> {
         const { body } = await this.elasticsearchService.search<PostSearchResult>({
             index: this.index,
+            from: offset,
+            size: limit,
             body: {
                 query: {
                     multi_match: {
                       query: text,
                       fields: ['title', 'content'],
                     },
+                },
+                sort: {
+                    id: {
+                        order: 'asc',
+                    }
                 },
             },
         });
