@@ -90,4 +90,11 @@ export class PostsService {
             },
         });
     }
+
+    async getPostsWithParagraphs(paragraph: string) {
+        return this.postsRepository.query(`
+            SELECT * FROM post 
+            WHERE $1 = ANY(paragraphs)
+        `, [paragraph]);
+    }
 }
