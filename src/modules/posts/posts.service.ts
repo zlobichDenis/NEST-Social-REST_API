@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { UserEntity } from '../users/entities';
 import { UpdatePostDto, CreatePostDto } from './dto';
 import { PostEntity } from './entities';
 import { PostNotFound } from './exceptions';
+import { PostSearchService } from './post-search/post-search.service';
 
 @Injectable()
 export class PostsService {
     constructor(
         @InjectRepository(PostEntity)
-        private postsRepository: Repository<PostEntity>,
+        private readonly postsRepository: Repository<PostEntity>,
+        private readonly postSearchService: PostSearchService,
     ) {
     }
 
@@ -41,6 +43,7 @@ export class PostsService {
             author: user,
         });
         await this.postsRepository.save(newPost);
+        this.postSearchService.indexPost(newPost);
 
         return newPost;
     }
@@ -58,6 +61,8 @@ export class PostsService {
             throw new PostNotFound(id);
         }
 
+        await this.postSearchService.update(updatedPost);
+
         return updatedPost;
     }
 
@@ -67,5 +72,22 @@ export class PostsService {
         if (!deletedPost.affected) {
             throw new PostNotFound(id);
         }
+
+        this.postSearchService.delete(id);
+    }
+
+    async searchForPosts(text: string) {
+        const results = await this.postSearchService.search(text);
+        const ids = results.map((result) => result.id);
+
+        if (!ids.length) {
+            return [];
+        }
+
+        return this.postsRepository.find({
+            where: {
+                id: In(ids),
+            },
+        });
     }
 }

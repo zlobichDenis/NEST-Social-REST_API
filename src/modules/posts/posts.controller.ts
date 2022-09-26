@@ -6,7 +6,7 @@ import {
     Put,
     Param,
     Body,
-    UseGuards, Req
+    UseGuards, Req, Query
 } from '@nestjs/common';
 
 import { FindOneParams } from '../../utils';
@@ -23,8 +23,12 @@ export class PostsController {
     ) {}
 
     @Get()
-    async getAllPosts() {
-        return this.postsService.getAllPosts();
+    async getPosts(@Query('search') search: string) {
+        if (!search) {
+            return this.postsService.getAllPosts();
+        }
+
+        return this.postsService.searchForPosts(search);
     }
 
     @Get(':id')

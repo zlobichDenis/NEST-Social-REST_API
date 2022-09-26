@@ -11,6 +11,7 @@ import { AuthenticationModule } from './modules/authentication/authentication.mo
 import { CategoriesModule } from './modules/categories/categories.module';
 import { FilesModule } from './modules/files/files.module';
 import { PrivateFilesModule } from './modules/private-files/private-files.module';
+import { SearchModule } from './modules/search/search.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { PrivateFilesModule } from './modules/private-files/private-files.module
     CategoriesModule,
     FilesModule,
     PrivateFilesModule,
+    SearchModule,
   ],
   controllers: [],
   providers: [
