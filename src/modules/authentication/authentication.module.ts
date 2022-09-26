@@ -7,7 +7,7 @@ import { getJwtConfig } from '../../config';
 import { UsersModule } from '../users/users.module';
 import { AuthenticationService } from './authentication.service';
 import { AuthenticationController } from './authentication.controller';
-import { LocalStrategy, JwtStrategy } from './strategies';
+import { LocalStrategy, JwtRefreshTokenStrategy, JwtStrategy } from './strategies';
 
 @Module({
   imports: [
@@ -23,6 +23,7 @@ import { LocalStrategy, JwtStrategy } from './strategies';
   providers: [
       AuthenticationService,
       LocalStrategy,
+      JwtRefreshTokenStrategy,
       JwtStrategy,
   ],
   controllers: [AuthenticationController],

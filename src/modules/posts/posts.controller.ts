@@ -6,7 +6,9 @@ import {
     Put,
     Param,
     Body,
-    UseGuards, Req, Query
+    UseGuards,
+    Req,
+    Query,
 } from '@nestjs/common';
 
 import { FindOneParams } from '../../utils';

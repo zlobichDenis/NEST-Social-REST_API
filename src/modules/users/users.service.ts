@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 import { PrivateFilesService } from '../private-files/private-files.service';
 import { PublicFileEntity } from '../files/entities';
@@ -38,6 +39,17 @@ export class UsersService {
         }
 
         return user;
+    }
+
+    async getUserIfRefreshTokenMatches(refreshToken: string, userId: number): Promise<UserEntity | undefined> {
+        const user = await this.getById(userId);
+
+         const isRefreshTokenMatches = user.currentHashedRefreshToken
+             && await bcrypt.compare(refreshToken, user.currentHashedRefreshToken);
+
+         if (isRefreshTokenMatches) {
+             return user;
+         }
     }
 
     async create(dto: CreateUserDto): Promise<UserEntity> {
@@ -100,5 +112,18 @@ export class UsersService {
                 };
             })
         ]);
+    }
+
+    async setCurrentRefreshToken(token: string, userId: number) {
+        const currentHashedRefreshToken = await bcrypt.hash(token, 10);
+        await this.usersRepository.update(userId, {
+            currentHashedRefreshToken,
+        })
+    }
+
+    async deleteRefreshToken(userId: number) {
+        return this.usersRepository.update(userId, {
+            currentHashedRefreshToken: undefined,
+        });
     }
 }
