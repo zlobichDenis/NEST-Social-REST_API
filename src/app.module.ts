@@ -12,6 +12,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { FilesModule } from './modules/files/files.module';
 import { PrivateFilesModule } from './modules/private-files/private-files.module';
 import { SearchModule } from './modules/search/search.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { SearchModule } from './modules/search/search.module';
     FilesModule,
     PrivateFilesModule,
     SearchModule,
+    SubscriptionModule,
   ],
   controllers: [],
   providers: [
